@@ -228,10 +228,10 @@ git push -u origin main
    - Connect your Twitter account when prompted
    - In the "Text" field, map the tweet content directly:
      - Click in the field to open the mapping panel
-     - Select `1. Webhooks › tweet_text` from the list of available data
-4. That's it! Save and activate your scenario
+     - Select `1. Webhooks › text` from the list of available data
+4. Test and activate your scenario
 
-The tweet data sent from your application already contains all the information needed, so no additional variable storage module is required for basic functionality.
+The simplified payload just contains the tweet text in a property called "text", making it much easier to map in Make.com.
 
 ## Customizing Content
 
