@@ -2,7 +2,7 @@ name: Generate Scheduled Tweets
 
 on:
   schedule:
-    - cron: "0 */8 * * *" # Runs every 8 hours
+    - cron: "0 * * * *" # Runs every 1 hour
   workflow_dispatch: # Allows manual triggering
 
 jobs:
