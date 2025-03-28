@@ -39,10 +39,13 @@ async function getTrendingTopics() {
 // Generate tweet based on trends
 async function generateTweet(topics) {
   try {
-    const trendsList = topics.join(", ");
+    // Select a random topic from the list
+    const randomIndex = Math.floor(Math.random() * topics.length);
+    const chosenTopic = topics[randomIndex];
+
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash",
-      contents: `Generate an insightful tweet about one of these topics: ${trendsList}.
+      contents: `Generate an insightful tweet about ${chosenTopic}.
       
       - Within 280 characters
       - Informative and engaging
@@ -52,15 +55,12 @@ async function generateTweet(topics) {
     });
     console.log("Full response:", response); // Log the entire response structure
 
-    // Adjust this line based on the logged structure
     return response.candidates[0].content.parts[0].text.trim();
   } catch (error) {
     console.error("Error generating tweet:", error);
-
-    // Fallback tweet if AI fails
-    return `Exploring the latest in ${
-      topics[0]
-    } today. Always amazed by the rapid innovations in this field! #${topics[0].replace(
+    // Fallback: choose a random topic for the fallback tweet
+    const fallbackTopic = topics[Math.floor(Math.random() * topics.length)];
+    return `Exploring the latest in ${fallbackTopic} today. Always amazed by the rapid innovations in this field! #${fallbackTopic.replace(
       /\s+/g,
       ""
     )} #TechTrends`;
@@ -154,7 +154,7 @@ async function postToIFTTT(tweet) {
   }
 }
 
-// Post to Make.com webhook
+// Post to Make.com webhook - simplified for maximum compatibility
 async function postToMake(tweet) {
   try {
     const webhookUrl = process.env.MAKE_WEBHOOK_URL;
@@ -164,19 +164,22 @@ async function postToMake(tweet) {
       return false;
     }
 
-    // Send tweet to Make.com webhook
+    console.log("Sending tweet to Make.com with simplified payload...");
+
+    // Simplified payload - just the tweet text as the main property
     const response = await axios.post(webhookUrl, {
-      tweet_text: tweet,
-      timestamp: new Date().toISOString(),
-      source: "AI Tweet Generator",
+      text: tweet, // Simple key for maximum compatibility
     });
 
-    console.log("Tweet sent to Make.com for posting");
+    console.log("Tweet sent to Make.com successfully");
+    console.log("Make.com response status:", response.status);
     return true;
   } catch (error) {
     console.error("Error posting to Make.com:", error.message);
-    if (error.response && error.response.data) {
+    if (error.response) {
+      console.error("Response status:", error.response.status);
       console.error("Response data:", error.response.data);
+      console.error("Response headers:", error.response.headers);
     }
     return false;
   }
