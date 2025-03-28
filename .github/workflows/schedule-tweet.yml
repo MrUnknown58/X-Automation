@@ -1,0 +1,45 @@
+name: Generate Scheduled Tweets
+
+on:
+  schedule:
+    - cron: "0 */8 * * *" # Runs every 8 hours
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  generate-tweet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create .env file
+        run: |
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
+          if [ ! -z "${{ secrets.MAKE_WEBHOOK_URL }}" ]; then
+            echo "MAKE_WEBHOOK_URL=${{ secrets.MAKE_WEBHOOK_URL }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.IFTTT_KEY }}" ]; then
+            echo "IFTTT_KEY=${{ secrets.IFTTT_KEY }}" >> .env
+          fi
+
+      - name: Generate Tweet
+        run: node tweet-generator.js
+
+      - name: Commit and push if tweet generated
+        run: |
+          git config --global user.name 'GitHub Action Bot'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add generated-tweets.md buffer-tweets.csv
+          git diff --quiet && git diff --staged --quiet || git commit -m "Generated new tweet $(date)"
+          git push

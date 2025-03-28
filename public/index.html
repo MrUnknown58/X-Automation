@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tweet Generator</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        padding: 20px;
+      }
+      .container {
+        max-width: 700px;
+        margin: 40px auto;
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .tweet-box {
+        border: 1px solid #e1e8ed;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 20px 0;
+        background-color: #f8f9fa;
+        min-height: 100px;
+        position: relative;
+      }
+      .character-count {
+        position: absolute;
+        bottom: 10px;
+        right: 15px;
+        font-size: 0.8rem;
+        color: #657786;
+      }
+      .btn-twitter {
+        background-color: #1da1f2;
+        color: white;
+      }
+      .btn-twitter:hover {
+        background-color: #0d95e8;
+        color: white;
+      }
+      .loader {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        border-top-color: #1da1f2;
+        animation: spin 1s ease-in-out infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center mb-4">AI Tweet Generator</h1>
+      <div class="mb-4">
+        <button id="generateBtn" class="btn btn-primary mb-3">
+          Generate Random Tweet
+        </button>
+
+        <div class="input-group mb-3">
+          <input
+            type="text"
+            id="topicInput"
+            class="form-control"
+            placeholder="Enter a topic (e.g., AI, Web Development, DevOps)"
+          />
+          <button id="topicBtn" class="btn btn-secondary">
+            Generate Tweet on Topic
+          </button>
+        </div>
+      </div>
+
+      <div id="loading" class="text-center mb-3" style="display: none">
+        <div class="loader"></div>
+        Generating tweet...
+      </div>
+
+      <div class="tweet-box">
+        <p id="tweetContent" class="mb-4">
+          Your generated tweet will appear here...
+        </p>
+        <div class="character-count">
+          <span id="characterCount">0</span>/280
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <button id="copyBtn" class="btn btn-outline-primary">
+          Copy to Clipboard
+        </button>
+        <a
+          id="tweetBtn"
+          href="https://twitter.com/intent/tweet"
+          target="_blank"
+          class="btn btn-twitter"
+          >Open Twitter to Post</a
+        >
+      </div>
+
+      <div class="mt-4">
+        <div class="alert alert-info">
+          <strong>How this works:</strong>
+          <ol>
+            <li>Generate a tweet (random or based on topic)</li>
+            <li>Copy it to clipboard with the "Copy" button</li>
+            <li>Click "Open Twitter to Post" to open Twitter in a new tab</li>
+            <li>Paste the tweet and post it yourself</li>
+          </ol>
+          <p class="mb-0">
+            <strong>Note:</strong> This approach doesn't use automation and
+            won't get your account locked!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const generateBtn = document.getElementById("generateBtn");
+        const topicBtn = document.getElementById("topicBtn");
+        const topicInput = document.getElementById("topicInput");
+        const tweetContent = document.getElementById("tweetContent");
+        const characterCount = document.getElementById("characterCount");
+        const copyBtn = document.getElementById("copyBtn");
+        const tweetBtn = document.getElementById("tweetBtn");
+        const loading = document.getElementById("loading");
+
+        // Generate random tweet
+        generateBtn.addEventListener("click", async function () {
+          loading.style.display = "block";
+          try {
+            const response = await fetch("/api/generate-tweet");
+            const data = await response.json();
+
+            tweetContent.textContent = data.tweet;
+            characterCount.textContent = data.tweet.length;
+            updateTweetButton(data.tweet);
+          } catch (error) {
+            console.error("Error:", error);
+            tweetContent.textContent =
+              "Error generating tweet. Please try again.";
+          } finally {
+            loading.style.display = "none";
+          }
+        });
+
+        // Generate tweet based on topic
+        topicBtn.addEventListener("click", async function () {
+          const topic = topicInput.value.trim();
+          if (!topic) {
+            alert("Please enter a topic");
+            return;
+          }
+
+          loading.style.display = "block";
+          try {
+            const response = await fetch("/api/generate-topic-tweet", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ topic }),
+            });
+            const data = await response.json();
+
+            tweetContent.textContent = data.tweet;
+            characterCount.textContent = data.tweet.length;
+            updateTweetButton(data.tweet);
+          } catch (error) {
+            console.error("Error:", error);
+            tweetContent.textContent =
+              "Error generating tweet. Please try again.";
+          } finally {
+            loading.style.display = "none";
+          }
+        });
+
+        // Copy tweet to clipboard
+        copyBtn.addEventListener("click", function () {
+          const text = tweetContent.textContent;
+          navigator.clipboard.writeText(text).then(
+            function () {
+              const originalText = copyBtn.textContent;
+              copyBtn.textContent = "Copied!";
+              setTimeout(() => {
+                copyBtn.textContent = originalText;
+              }, 1500);
+            },
+            function (err) {
+              console.error("Could not copy text: ", err);
+              alert(
+                "Could not copy text. Please try manually selecting and copying."
+              );
+            }
+          );
+        });
+
+        // Update tweet button with current text
+        function updateTweetButton(text) {
+          const encodedText = encodeURIComponent(text);
+          tweetBtn.href = `https://twitter.com/intent/tweet?text=${encodedText}`;
+        }
+
+        // Enter key triggers topic generation
+        topicInput.addEventListener("keypress", function (event) {
+          if (event.key === "Enter") {
+            topicBtn.click();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
