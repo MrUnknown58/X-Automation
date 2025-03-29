@@ -6,7 +6,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "tweet": "node tweet-generator.js",
-    "tweet:dev": "node tweet-dev.js"
+    "tweet:dev": "node tweet-dev.js",
+    "tweet:prod": "node tweet-prod.js"
   },
   "keywords": [],
   "author": "",

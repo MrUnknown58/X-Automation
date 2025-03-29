@@ -44,7 +44,7 @@ async function generateTweet(topics) {
     const chosenTopic = topics[randomIndex];
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-pro-exp-03-25",
+      model: "gemini-2.0-flash",
       contents: `Generate an engaging, conversational tweet about ${chosenTopic}, focusing on current trends in either technology or India.
       
       Make it:
