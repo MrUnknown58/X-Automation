@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "tweet": "node tweet-generator.js",
+    "tweet:dev": "node tweet-dev.js"
   },
   "keywords": [],
   "author": "",

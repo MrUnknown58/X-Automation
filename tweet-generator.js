@@ -44,14 +44,19 @@ async function generateTweet(topics) {
     const chosenTopic = topics[randomIndex];
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: `Generate an insightful tweet about ${chosenTopic}.
+      model: "gemini-2.5-pro-exp-03-25",
+      contents: `Generate an engaging, conversational tweet about ${chosenTopic}, focusing on current trends in either technology or India.
       
-      - Within 280 characters
-      - Informative and engaging
-      - Include 1-2 relevant hashtags
-      - Relate to current events or technology
-      - Only output the tweet text, no additional context`,
+      Make it:
+      - Personal and human-like (use "I", ask questions, share opinions)
+      - Conversational, as if talking to followers directly
+      - Include at least 2-3 relevant hashtags strategically placed
+      - Within 280 characters, but use most of the available space
+      - Mention current events or recent developments
+      - End with a call-to-action inviting people to follow, share thoughts, or connect via hashtags
+      - Sound like a real person, not AI-generated
+      
+      Only output the tweet text, no additional context`,
     });
     console.log("Full response:", response); // Log the entire response structure
 
@@ -164,6 +169,14 @@ async function postToMake(tweet) {
       return false;
     }
 
+    // Skip posting to Make.com in development environment
+    const isDevelopment = process.env.NODE_ENV === "development";
+    if (isDevelopment) {
+      console.log("DEV MODE: Skipping actual Make.com webhook call");
+      console.log("Would have sent this payload:", { text: tweet });
+      return true;
+    }
+
     console.log("Sending tweet to Make.com with simplified payload...");
 
     // Simplified payload - just the tweet text as the main property
@@ -199,6 +212,7 @@ async function main() {
 
   // Try posting via Make.com if configured
   if (process.env.MAKE_WEBHOOK_URL) {
+    // Always attempt to post, but postToMake function will handle dev mode
     await postToMake(tweet);
   }
 

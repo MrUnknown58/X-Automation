@@ -14,13 +14,19 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const getTweet = async () => {
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: `Generate a concise, engaging, and insightful tweet about current technologies (e.g., React, Node.js, Golang, AI, DevOps, etc.).
+      model: "gemini-2.5-pro-exp-03-25",
+      contents: `Generate an engaging, conversational tweet about current trends in either technology or India.
           
-          - Within 280 characters.
-          - Informative or engaging.
-          - Include 1-3 relevant hashtags.
-          - No extra text, only the tweet content.`,
+          Make it:
+          - Personal and human-like (use "I", ask questions, share opinions)
+          - Conversational, as if talking to followers directly 
+          - Include at least 2-3 relevant hashtags strategically placed
+          - Within 280 characters, but use most of the available space
+          - Mention current events or recent developments
+          - End with a call-to-action inviting people to follow, share thoughts, or connect via hashtags
+          - Sound like a real person, not AI-generated
+          
+          Only output the tweet text, no additional context.`,
     });
 
     return response.candidates[0].content.parts[0].text;
@@ -33,13 +39,19 @@ const getTweet = async () => {
 const getTrendingTweet = async (topic) => {
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: `Generate an insightful tweet about ${topic}.
+      model: "gemini-2.5-pro-exp-03-25",
+      contents: `Generate an engaging, conversational tweet about ${topic}, incorporating current trends in either technology or India if relevant.
         
-        - Within 280 characters
-        - Informative and engaging
-        - Include 1-2 relevant hashtags
-        - No extra text, only the tweet content.`,
+        Make it:
+        - Personal and human-like (use "I", ask questions, share opinions)
+        - Conversational, as if talking to followers directly
+        - Include at least 2-3 relevant hashtags strategically placed
+        - Within 280 characters, but use most of the available space
+        - Mention current events or recent developments
+        - End with a call-to-action inviting people to follow, share thoughts, or connect via hashtags
+        - Sound like a real person, not AI-generated
+        
+        Only output the tweet text, no additional context.`,
     });
 
     return response.candidates[0].content.parts[0].text.trim();

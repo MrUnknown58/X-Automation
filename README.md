@@ -80,13 +80,14 @@ cp .env.example .env
 ### 2. Test Tweet Generation Script
 
 ```bash
-# Run the tweet generator script
-node tweet-generator.js
+# Run the tweet generator script in development mode (won't post to Make.com)
+npm run tweet:dev
 
 # Expected results:
 # - Console should show generated tweet content
 # - A new tweet should appear in generated-tweets.md
 # - A new entry should be added to buffer-tweets.csv
+# - If Make.com webhook URL is configured, it will log the payload but NOT send it
 ```
 
 ### 3. Test Make.com Integration
@@ -165,6 +166,7 @@ npm start
 ## Common Testing Issues
 
 - **"GEMINI_API_KEY not found" error**: Make sure you've added your API key to the `.env` file
+- **Want to test without sending tweets**: Use `npm run tweet:dev` instead of `node tweet-generator.js`
 - **Tweets not generating**: Check Gemini API key validity or try adding console logs
 - **Make.com webhook failing**: Verify your webhook URL and check Make.com execution history
 - **Buffer CSV format issues**: Compare with example CSV or check documentation
