@@ -51,7 +51,7 @@ async function generateTweet(topics) {
       - Personal and human-like (use "I", ask questions, share opinions)
       - Conversational, as if talking to followers directly
       - Include at least 2-3 relevant hashtags strategically placed
-      - Within 280 characters, but use most of the available space
+      - Within 260 characters, but use most of the available space
       - Mention current events or recent developments
       - End with a call-to-action inviting people to follow, share thoughts, or connect via hashtags
       - Sound like a real person, not AI-generated
